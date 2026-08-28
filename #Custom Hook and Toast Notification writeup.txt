@@ -1,0 +1,122 @@
+# Custom Hook and Toast Notification – Write-up
+
+### 1. What is a custom hook? Why must its name start with "use"?
+
+A **custom hook** is a reusable JavaScript function in React that allows us to reuse state and logic between different components.
+
+For example, `useForm` can handle form values, validation, errors, and form submission logic.
+
+The name of a custom hook should start with **`use`**, such as `useForm`, because React uses this naming convention to identify functions that use Hooks. It also helps React and developers follow the Rules of Hooks.
+
+---
+
+
+
+
+
+### 2. Paste your useForm hook code. How does one hook handle validation for multiple different fields?
+
+My `useForm` hook stores all form values and errors in one place. It receives validation rules and checks each field when the form is submitted.
+
+```javascript
+import { useState } from "react";
+
+const useForm = (initialValues, validate) => {
+  const [values, setValues] = useState(initialValues);
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setValues({
+      ...values,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const validationErrors = validate(values);
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      return true;
+    }
+
+    return false;
+  };
+
+  return {
+    values,
+    errors,
+    handleChange,
+    handleSubmit
+  };
+};
+
+export default useForm;
+```
+
+The same hook can handle multiple fields because it stores the fields inside the `values` object.
+
+For example:
+
+```javascript
+{
+  name: "",
+  email: "",
+  message: ""
+}
+```
+
+The `validate()` function checks each field and returns the required error messages. This allows one reusable hook to handle different forms and different fields without writing the same logic again.
+
+---
+
+
+
+
+
+### 3. How does your toast message disappear automatically after 3 seconds?
+
+I use `setTimeout()` to automatically hide the toast after **3 seconds**.
+
+The exact code is:
+
+```javascript
+setTimeout(() => {
+  setToast({
+    message: "",
+    type: ""
+  });
+}, 3000);
+```
+
+Here, `3000` means **3000 milliseconds**, which is equal to **3 seconds**.
+
+So after showing the success or error toast, it automatically disappears after 3 seconds without the user having to click anything.
+
+---
+
+  
+
+
+
+
+### 4. Why is a toast notification better UX than alert()?
+
+A **toast notification** provides a better user experience because it does not interrupt the user.
+
+`alert()` opens a browser popup and the user must click **OK** before continuing.
+
+A toast appears on the page without blocking the user. It can automatically disappear after a few seconds.
+
+For example:
+
+* **alert():** Blocks the page until the user clicks OK.
+* **Toast:** Shows a short message and disappears automatically.
+* **Toast:** Looks more modern and matches the website design.
+* **Toast:** Allows the user to continue using the page immediately.
+
+Therefore, toast notifications provide a **smooth, modern, and less disruptive user experience** compared to `alert()`.
